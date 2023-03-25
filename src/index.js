@@ -1,8 +1,8 @@
 import './css/styles.css';
 import axios from 'axios';
-import axios from 'axios';
 import Notiflix from 'notiflix';
-import Notiflix from 'notiflix';
+import SimpleLightbox from 'simplelightbox';
+import 'simplelightbox/dist/simple-lightbox.min.css';
 
 // отримуємо доступ до елем зі сторінки
 const refs = {
@@ -47,6 +47,7 @@ function onSearchForm(e) {
 
 // функція обробляє клік на завантаж більше
 function onClickBtnLoadMore() {
+  const searchQuery = refs.inputEl.value.trim();
   page += 1;
   pixabay(searchQuery, page);
 }
@@ -87,7 +88,7 @@ async function pixabay(name, page) {
 function createMarkup(stock) {
   const markup = stock
     .map(
-      item => `
+      item => `<a href="${item.largeImageURL}" class="link-img">
         <div class="photo-card">
   <img src="${item.webformatURL}" alt="${item.tags}" loading="lazy" />
   <div class="info">
@@ -108,12 +109,13 @@ function createMarkup(stock) {
       ${item.downloads}
     </p>
   </div>
-</div>`
+</div></a>`
     )
     .join('');
 
   // додаємо розмітку на сторінку
   refs.gallery.insertAdjacentHTML('beforeend', markup);
+  simpleLightbox.refresh();
 }
 
 // функція для сповіщень
@@ -140,3 +142,11 @@ function notificationMsg(length, totalHits) {
     );
   }
 }
+
+//підключення модального вікна з затримкою опису в 250мс
+const simpleLightbox = new SimpleLightbox('.gallery a', {
+  captionPosition: 'bottom',
+  captionDelay: 250,
+  captionsData: 'alt',
+  overlayOpacity: 0.5,
+});
