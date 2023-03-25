@@ -12,6 +12,9 @@ const refs = {
   btnLoadMore: document.querySelector('.load-more'),
 };
 // console.log(refs.btnLoadMore);
+// змінна пейдж =1
+
+let page = 1;
 
 // слухачі подій для сабміту форми і кнопки завантаж більше
 refs.formEl.addEventListener('submit', onSearchForm);
@@ -23,9 +26,7 @@ refs.btnLoadMore.style.display = 'none';
 function onSearchForm(e) {
   // скасовуємо завантаження за замовчуванням
   e.preventDefault();
-
-  // змінна пейдж =1
-  let page = 1;
+  page = 1;
   // очищуємо вміст галереї
   refs.gallery.innerHTML = '';
 
@@ -45,7 +46,10 @@ function onSearchForm(e) {
 }
 
 // функція обробляє клік на завантаж більше
-function onClickBtnLoadMore() {}
+function onClickBtnLoadMore() {
+  page += 1;
+  pixabay(searchQuery, page);
+}
 
 //функція для http-запитів з pixabay
 async function pixabay(name, page) {
@@ -68,6 +72,10 @@ async function pixabay(name, page) {
   //отримуємо результат від бекенд
   try {
     const response = await axios.get(BASE_URL, options);
+    const length = response.data.hits.length;
+    const totalHits = response.data.total;
+
+    notificationMsg(length, totalHits);
 
     createMarkup(response.data.hits);
   } catch (error) {
@@ -106,4 +114,29 @@ function createMarkup(stock) {
 
   // додаємо розмітку на сторінку
   refs.gallery.insertAdjacentHTML('beforeend', markup);
+}
+
+// функція для сповіщень
+function notificationMsg(length, totalHits) {
+  // якщо зображень не знайдено -вивести повідомлення , що немає спробуйте ще
+  if (length === 0) {
+    Notiflix.Notify.failure(
+      'Sorry, there are no images matching your search query. Please try again.'
+    );
+    return;
+  }
+
+  if (page === 1) {
+    //   показуємо кнопку завантажити ще
+    refs.btnLoadMore.style.display = 'flex';
+    //   сповіщення про успішну операцію
+    Notiflix.Notify.success(`Hooray! We found ${totalHits} images.`);
+  }
+  // якщо прийшло менеше 40 зображ, значить вони скінчились, ховаємо кнопку і виводимо повідомлення
+  if (length < 40) {
+    refs.btnLoadMore.style.display = 'none';
+    Notiflix.Notify.info(
+      "We're sorry, but you've reached the end of search results."
+    );
+  }
 }
