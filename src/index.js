@@ -90,7 +90,9 @@ function createMarkup(stock) {
     .map(
       item => `<a href="${item.largeImageURL}" class="link-img">
         <div class="photo-card">
-  <img src="${item.webformatURL}" alt="${item.tags}" loading="lazy" />
+        <div class="photo">
+  <img src="${item.webformatURL}" alt="${item.tags}" loading="lazy" class="img" />
+  </div>
   <div class="info">
     <p class="info-item">
       <b>Likes</b>
